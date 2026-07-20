@@ -1,0 +1,9 @@
+data/raw/
+data/staging/
+data/dry-run/
+data/checkpoints/
+data/errors/
+data/cache/
+node_modules/
+*.log
+pg-secondhand-crawler/

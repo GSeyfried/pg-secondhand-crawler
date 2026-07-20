@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+import { commandOptions, print } from './common.js';import { buildPlannerArtifacts, savePlannerArtifacts } from '../planner/io.js';
+try{const options=commandOptions(process.argv.slice(2)),a=await buildPlannerArtifacts(options);await savePlannerArtifacts(a);print({mode:options.dryRun?'dry-run':'production',kitPlanId:a.plan.kitPlanId,targetDate:a.plan.targetCompletionDate,maximumBudget:a.plan.maximumTotalBudget,strategies:a.scenarios.strategies.map(x=>({name:x.name,minimumProjectedTotal:x.minimumProjectedTotal,projectedFinalTotal:x.projectedFinalTotal,missingComponents:x.missingComponents,qualifying:x.qualifying,withinBudget:x.withinBudget})),output:a.paths.scenarios});}catch(e){console.error(e.message);process.exitCode=1;}

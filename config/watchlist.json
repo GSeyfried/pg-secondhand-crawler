@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ozone-buzz-value",
+    "equipmentType": "wing",
+    "manufacturer": "Ozone",
+    "models": ["Buzz Z6", "Buzz Z7"],
+    "modelFamily": "Buzz",
+    "acceptableSizes": ["S", "MS"],
+    "maximumPrice": 1500,
+    "preferredPrice": 1250,
+    "requiredCertification": "low-en-b",
+    "requirePorosityPass": true,
+    "minimumCondition": "good",
+    "yearRange": { "min": 2018, "max": 2026 },
+    "geographicArea": ["US", "CA"],
+    "shippingAvailability": null,
+    "bundleContents": [],
+    "notes": "Must fit estimated all-up weight range"
+  }
+]
