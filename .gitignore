@@ -5,5 +5,9 @@ data/checkpoints/
 data/errors/
 data/cache/
 node_modules/
+.env
+.env.*
+!.env.example
+.vercel/
 *.log
 pg-secondhand-crawler/
