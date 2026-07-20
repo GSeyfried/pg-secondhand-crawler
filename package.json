@@ -14,7 +14,8 @@
     "evaluate-watchlist": "node src/commands/evaluate-watchlist.js",
     "build-acquisition-plan": "node src/commands/build-acquisition-plan.js",
     "acquisition-report": "node src/commands/acquisition-report.js",
-    "dashboard": "node src/dashboard/server.js"
+    "dashboard": "node src/dashboard/server.js",
+    "upload-baseline": "node --env-file=.env.local src/commands/upload-baseline.js"
   },
   "engines": {
     "node": ">=20"
