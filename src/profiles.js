@@ -1,10 +1,11 @@
 import { readFile } from 'node:fs/promises';
 
+const defaultPlanUrl=new URL('../config/kit-plans/griffin-primary-kit.json',import.meta.url),defaultWatchlistUrl=new URL('../config/watchlist.json',import.meta.url);
 const json=async pathname=>JSON.parse(await readFile(pathname,'utf8'));
 const finite=(value,name,{min=0}={})=>{const number=Number(value);if(!Number.isFinite(number)||number<min)throw new Error(`${name} must be at least ${min}`);return number;};
 
 export async function loadDefaultProfile(){
-  return {id:'griffin-primary-kit',displayName:'Griffin',plan:await json('config/kit-plans/griffin-primary-kit.json'),watchlist:await json('config/watchlist.json'),updatedAt:null};
+  return {id:'griffin-primary-kit',displayName:'Griffin',plan:await json(defaultPlanUrl),watchlist:await json(defaultWatchlistUrl),updatedAt:null};
 }
 
 export function normalizeProfile(input,id=input?.id){
