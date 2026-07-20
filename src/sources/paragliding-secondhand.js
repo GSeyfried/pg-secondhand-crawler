@@ -15,10 +15,10 @@ function booleanLabel(value){if(value==null)return null;if(/^yes$/i.test(value))
 function listingDate(html,retrievedAt){const raw=html.match(/fa-calendar[^<]*<\/i>\s*(\d{1,2}-[A-Za-z]{3}-\d{4})/i)?.[1]??meta(html,'article:published_time');if(!raw)return{listedAt:null,listingAgeDays:null};const parsed=new Date(raw);if(Number.isNaN(parsed.valueOf()))return{listedAt:null,listingAgeDays:null};const listedAt=new Date(Date.UTC(parsed.getUTCFullYear(),parsed.getUTCMonth(),parsed.getUTCDate()));const seen=new Date(retrievedAt);const seenDay=Date.UTC(seen.getUTCFullYear(),seen.getUTCMonth(),seen.getUTCDate());return{listedAt:listedAt.toISOString(),listingAgeDays:Math.max(0,Math.floor((seenDay-listedAt.valueOf())/86400000))};}
 function absoluteUrls(values){const urls=[];for(const value of values.flat().filter(Boolean)){try{const u=new URL(decodeHtml(value),base);if(/^https?:$/.test(u.protocol))urls.push(u.toString());}catch{}}return[...new Set(urls)];}
 export const adapter={
-  name:source, baseUrl:base,
+  name:source, baseUrl:base, sitemapUrl:`${base}/sitemap.xml`,
   indexUrl(page){return `${base}/categories/paragliders${page>1?`?page=${page}`:''}`;},
   indexUrls(page,categories){return categories.map(category=>`${base}/categories/${category}${page>1?`?page=${page}`:''}`);},
-  extractListingUrls(html){const urls=[];for(const m of html.matchAll(/href=["']([^"']+)["']/gi)){try{const candidate=new URL(decodeHtml(m[1]),base);if(!/^\/listings\/[^/]+\/?$/.test(candidate.pathname))continue;urls.push(canonicalUrl(candidate.toString()));}catch{}}return [...new Set(urls)];},
+  extractListingUrls(html){const urls=[];for(const m of html.matchAll(/(?:href=["']([^"']+)["']|<loc>\s*([^<]+)\s*<\/loc>)/gi)){try{const candidate=new URL(decodeHtml(m[1]??m[2]),base);if(!/^\/listings\/[^/]+\/?$/.test(candidate.pathname))continue;urls.push(canonicalUrl(candidate.toString()));}catch{}}return [...new Set(urls)];},
   sourceId(url){return url.match(/-(\d+)\/?(?:\?|$)/)?.[1]??null;},
   async fixtureUrls(dataDir){const dir=path.join(dataDir,'fixtures',source);return (await readdir(dir)).filter(x=>x.endsWith('.html')).sort().map((name,index)=>`${base}/listings/fixture-${10001+index}?fixture=${encodeURIComponent(name)}`);},
   async fetchFixture(url,dataDir){const name=new URL(url).searchParams.get('fixture');if(!name || path.basename(name)!==name)throw new Error('Invalid fixture URL');const body=await readFile(path.join(dataDir,'fixtures',source,name),'utf8');return{url,status:200,body,retrievedAt:'2026-01-01T00:00:00.000Z'};},

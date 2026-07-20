@@ -22,6 +22,7 @@ npm test
 npm run crawl:five
 npm run crawl -- --source paragliding-secondhand --dry-run --max-listings 5 --batch-size 2 --verbose
 npm run crawl -- --source paragliding-secondhand --resume --batch-size 10 --no-dry-run
+npm run crawl -- --source paragliding-secondhand --full-site --max-listings 5000 --batch-size 25 --resume --no-dry-run
 npm run update-market-stats
 npm run evaluate-watchlist
 npm run build-acquisition-plan -- --kit-plan griffin-primary-kit --target-date 2026-09-30 --max-budget 3000
@@ -34,6 +35,8 @@ Live crawling checks `robots.txt` before fetching index/listing pages. If the po
 CLI settings have `PG_CRAWLER_` environment equivalents: `DRY_RUN`, `BATCH_SIZE`, `MAX_LISTINGS`, `START_OFFSET`, `CONCURRENCY`, `DELAY_MS`, `SOURCE`, `RESUME`, `FORCE_REFRESH`, and `VERBOSE`. For example, `PG_CRAWLER_MAX_LISTINGS=5`. A JSON config can be supplied with `--config path.json`; precedence is CLI, environment, config file, defaults. Boolean CLI flags accept `--flag`, `--no-flag`, or `--flag=true|false`.
 
 Defaults are dry-run enabled, batch size 10, maximum 25, concurrency 2, and a 1000 ms per-request delay. Useful additional options are `--fixture-only`, `--timeout-ms`, `--max-retries`, and `--index-pages`.
+
+`--full-site` discovers listing URLs from the source's published sitemap instead of category pages. Use it for an initial baseline; keep `--resume` enabled so an interrupted run skips completed URLs. It still checks `robots.txt` before fetching any listing.
 
 By default the source index covers `full-kits,paragliders,harnesses,reserves,helmets` and round-robins discovered URLs so a small run samples every required category. Override this with `--categories`, for example `--categories full-kits,paragliders,harnesses,reserves,instruments,helmets`.
 

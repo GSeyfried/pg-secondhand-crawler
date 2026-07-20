@@ -18,7 +18,7 @@ export async function runCrawler({config,adapter,storage,logger}) {
   else {
     const robots=await http.fetchText(`${adapter.baseUrl}/robots.txt`);robotsText=robots.body;
     if(robots.status!==200) throw new Error(`robots.txt unavailable (${robots.status}); refusing live crawl`);
-    const targets=[...Array(config.indexPages)].flatMap((_,index)=>adapter.indexUrls?adapter.indexUrls(index+1,config.categories):[adapter.indexUrl(index+1)]);
+    const targets=config.fullSite&&adapter.sitemapUrl?[adapter.sitemapUrl]:[...Array(config.indexPages)].flatMap((_,index)=>adapter.indexUrls?adapter.indexUrls(index+1,config.categories):[adapter.indexUrl(index+1)]);
     if(targets.some(url=>!isRobotsAllowed(robots.body,url)))throw new Error('robots.txt disallows the configured index');
     logger.info('Robots policy checked',{source:adapter.name,stage:'robots',result:'allowed',robotsUrl:`${adapter.baseUrl}/robots.txt`});
     const groups=[];for(const target of targets){const response=await http.fetchText(target);summary.indexPagesFetched++;groups.push(adapter.extractListingUrls(response.body));}urls=roundRobin(groups);

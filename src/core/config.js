@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 
-export const defaults = Object.freeze({ dryRun: true, batchSize: 10, maxListings: 25, startOffset: 0, concurrency: 2, delayMs: 1000, source: 'paragliding-secondhand', categories: ['full-kits','paragliders','harnesses','reserves','helmets'], resume: false, forceRefresh: false, verbose: false, fixtureOnly: false, timeoutMs: 15000, maxRetries: 3, indexPages: 1, dataDir: 'data' });
+export const defaults = Object.freeze({ dryRun: true, batchSize: 10, maxListings: 25, startOffset: 0, concurrency: 2, delayMs: 1000, source: 'paragliding-secondhand', categories: ['full-kits','paragliders','harnesses','reserves','helmets'], resume: false, forceRefresh: false, verbose: false, fixtureOnly: false, fullSite: false, timeoutMs: 15000, maxRetries: 3, indexPages: 1, dataDir: 'data' });
 const numberKeys = new Set(['batchSize','maxListings','startOffset','concurrency','delayMs','timeoutMs','maxRetries','indexPages']);
-const booleanKeys = new Set(['dryRun','resume','forceRefresh','verbose','fixtureOnly']);
-const names = { 'dry-run':'dryRun', 'batch-size':'batchSize', 'max-listings':'maxListings', 'start-offset':'startOffset', concurrency:'concurrency', 'delay-ms':'delayMs', source:'source', categories:'categories', resume:'resume', 'force-refresh':'forceRefresh', verbose:'verbose', 'fixture-only':'fixtureOnly', 'timeout-ms':'timeoutMs', 'max-retries':'maxRetries', 'index-pages':'indexPages', 'data-dir':'dataDir' };
+const booleanKeys = new Set(['dryRun','resume','forceRefresh','verbose','fixtureOnly','fullSite']);
+const names = { 'dry-run':'dryRun', 'batch-size':'batchSize', 'max-listings':'maxListings', 'start-offset':'startOffset', concurrency:'concurrency', 'delay-ms':'delayMs', source:'source', categories:'categories', resume:'resume', 'force-refresh':'forceRefresh', verbose:'verbose', 'fixture-only':'fixtureOnly', 'full-site':'fullSite', 'timeout-ms':'timeoutMs', 'max-retries':'maxRetries', 'index-pages':'indexPages', 'data-dir':'dataDir' };
 const envNames = Object.fromEntries(Object.values(names).map(k => [k, `PG_CRAWLER_${k.replace(/[A-Z]/g, m => `_${m}`).toUpperCase()}`]));
 
 function asBoolean(value, name) {
@@ -45,4 +45,4 @@ export async function loadConfig(argv, env=process.env) {
   if (!config.categories.length) throw new Error('categories must include at least one category');
   return config;
 }
-export const help = `pg-secondhand-crawler\n\nOptions:\n  --dry-run / --no-dry-run\n  --batch-size N --max-listings N --start-offset N\n  --concurrency N --delay-ms N --source NAME|all\n  --categories full-kits,paragliders,harnesses,reserves,helmets\n  --resume --force-refresh --verbose --fixture-only\n  --timeout-ms N --max-retries N --index-pages N\n  --config FILE --data-dir DIR`;
+export const help = `pg-secondhand-crawler\n\nOptions:\n  --dry-run / --no-dry-run\n  --batch-size N --max-listings N --start-offset N\n  --concurrency N --delay-ms N --source NAME|all\n  --categories full-kits,paragliders,harnesses,reserves,helmets\n  --resume --force-refresh --verbose --fixture-only --full-site\n  --timeout-ms N --max-retries N --index-pages N\n  --config FILE --data-dir DIR`;
