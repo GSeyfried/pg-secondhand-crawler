@@ -3,7 +3,7 @@ import os from 'node:os';
 import { get, put } from '@vercel/blob';
 
 export const WEEKLY_STATE_PATH='pg-secondhand-crawler/weekly-state.json';
-const blankState=()=>({version:1,listings:[],history:[],comparisons:null,checkpoints:{},errors:[],lastRun:null});
+const blankState=()=>({version:1,listings:[],history:[],comparisons:null,checkpoints:{},errors:[],profiles:{},lastRun:null});
 
 export function blobStorageConfigured(env=process.env) {
   return Boolean(env.BLOB_READ_WRITE_TOKEN||(env.VERCEL_OIDC_TOKEN&&env.BLOB_STORE_ID));

@@ -64,6 +64,12 @@ Vercel calls `GET /api/cron/weekly` every Monday at 15:00 UTC. The authenticated
 
 The endpoint requires Vercel's `CRON_SECRET` bearer header. Hosted state requires a private Blob store connected to the project. Cron jobs run only from production deployments; preview deployments do not register or execute the schedule.
 
+## Pilot profiles
+
+The dashboard's Pilot Profiles page keeps the tracked listings shared while applying independent acquisition settings for each pilot. A profile includes pilot and all-up weight, total budget, target date, wing class, porosity and inspection requirements, component price ranges, and watch rules. Griffin's tracked repository config remains the fallback profile.
+
+Hosted profile edits are saved inside the same private Blob snapshot as crawler history. Writes require the `CRON_SECRET` bearer value; the browser asks for it when saving and retains it only in that tab's session storage. Profile reads and the selected dashboard view do not expose the secret.
+
 ## Normalized schema
 
 See [`docs/schema.md`](docs/schema.md). Unknown facts remain `null`; parsers do not infer missing facts.
