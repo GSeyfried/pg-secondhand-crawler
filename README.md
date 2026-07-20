@@ -15,7 +15,7 @@ The repository was initially empty; there was no incomplete implementation to mi
 
 ## Usage
 
-Requires Node 20 or newer and no third-party packages.
+Requires Node 20 or newer. Dependencies are installed only inside this project with `npm install`; nothing is installed globally.
 
 ```bash
 npm test
@@ -54,6 +54,12 @@ Dashboard command execution is intentionally constrained to a server-side allowl
 The editable goal and watch rules are in [`config/kit-plans/griffin-primary-kit.json`](config/kit-plans/griffin-primary-kit.json) and [`config/watchlist.json`](config/watchlist.json). Generated planner artifacts are isolated below `data/dry-run/planner/` until production mode is explicitly requested.
 
 Vercel recognizes the root `server.js` through `package.json.main`. Hosted deployments automatically enter read-only mode: planner data and static assets remain available, while child-process command execution returns HTTP 403. See [`docs/hosting-roadmap.md`](docs/hosting-roadmap.md) before adding persistence or scheduled automation.
+
+## Weekly hosted crawl
+
+Vercel calls `GET /api/cron/weekly` every Monday at 15:00 UTC. The authenticated job checks `robots.txt`, samples up to 25 listings across full kits, wings, harnesses, reserves, and helmets, then stores normalized listings, source URLs, listing age, history changes, and kit comparisons in a private Vercel Blob snapshot. Set `PG_CRAWLER_WEEKLY_MAX_LISTINGS` to a value from 1–100 to adjust the cap.
+
+The endpoint requires Vercel's `CRON_SECRET` bearer header. Hosted state requires a private Blob store connected to the project. Cron jobs run only from production deployments; preview deployments do not register or execute the schedule.
 
 ## Normalized schema
 

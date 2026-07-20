@@ -9,12 +9,17 @@
     "crawl": "node src/cli.js",
     "test": "node --test",
     "test:fixtures": "node --test test/parser.test.js",
-    "crawl:five": "node src/cli.js --source paragliding-secondhand --dry-run --fixture-only --max-listings 5 --batch-size 2 --verbose"
-    ,"update-market-stats": "node src/commands/update-market-stats.js"
-    ,"evaluate-watchlist": "node src/commands/evaluate-watchlist.js"
-    ,"build-acquisition-plan": "node src/commands/build-acquisition-plan.js"
-    ,"acquisition-report": "node src/commands/acquisition-report.js"
-    ,"dashboard": "node src/dashboard/server.js"
+    "crawl:five": "node src/cli.js --source paragliding-secondhand --dry-run --fixture-only --max-listings 5 --batch-size 2 --verbose",
+    "update-market-stats": "node src/commands/update-market-stats.js",
+    "evaluate-watchlist": "node src/commands/evaluate-watchlist.js",
+    "build-acquisition-plan": "node src/commands/build-acquisition-plan.js",
+    "acquisition-report": "node src/commands/acquisition-report.js",
+    "dashboard": "node src/dashboard/server.js"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.6.1"
+  }
 }
