@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+import http from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildPlannerArtifacts } from '../planner/io.js';
+import { daysUntilTarget, acquisitionPhase } from '../planner/kit-plan.js';
+import { priceDropSummary } from '../planner/history.js';
+
+const projectRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..'),publicDir=path.join(projectRoot,'src/dashboard/public'),port=Number(process.env.PORT??4173),host=process.env.VERCEL?'0.0.0.0':'127.0.0.1',isHosted=Boolean(process.env.VERCEL),jobs=new Map();
+const commandMap={
+  'crawl-fixtures':{label:'Fixture dry run',command:process.execPath,args:['src/cli.js','--source','paragliding-secondhand','--dry-run','--fixture-only','--max-listings','5','--batch-size','2']},
+  'crawl-live-five':{label:'Live 5-listing dry run',command:process.execPath,args:['src/cli.js','--source','paragliding-secondhand','--dry-run','--max-listings','5','--batch-size','2']},
+  'market-stats':{label:'Update market statistics',command:process.execPath,args:['src/commands/update-market-stats.js','--dry-run']},
+  'watchlist':{label:'Evaluate watchlist',command:process.execPath,args:['src/commands/evaluate-watchlist.js','--dry-run']},
+  'plan':{label:'Build acquisition plan',command:process.execPath,args:['src/commands/build-acquisition-plan.js','--dry-run','--kit-plan','griffin-primary-kit']},
+  'report':{label:'Generate acquisition report',command:process.execPath,args:['src/commands/acquisition-report.js','--dry-run','--kit-plan','griffin-primary-kit']},
+  'tests':{label:'Run test suite',command:process.execPath,args:['--test']}
+};
+const send=(res,status,value,type='application/json; charset=utf-8')=>{res.writeHead(status,{'content-type':type,'cache-control':'no-store'});res.end(type.startsWith('application/json')?JSON.stringify(value):value);};
+async function dashboardData(){const a=await buildPlannerArtifacts({dryRun:true,kitPlanId:'griffin-primary-kit'}),drops=a.history.map(x=>priceDropSummary(x)).filter(x=>x?.absoluteDrop>0).sort((x,y)=>y.percentDrop-x.percentDrop).slice(0,8),recent=a.history.filter(x=>x.lifecycleEvents.some(e=>e.type==='new-listing')).slice(-8).reverse().map(x=>({listingId:x.listingId,title:x.observations.at(-1)?.title,sourceUrl:x.sourceUrl,firstSeenAt:x.firstSeenAt}));return{localOnly:!isHosted,hosted:isHosted,plan:a.plan,daysRemaining:daysUntilTarget(a.plan),phase:acquisitionPhase(a.plan),report:a.report,scenarios:a.scenarios,watchMatches:a.watchMatches,alerts:a.alerts,marketStats:a.stats.groups,priceDrops:drops,newListings:recent,historyCount:a.history.length,commands:isHosted?[]:Object.entries(commandMap).map(([id,x])=>({id,label:x.label})),jobs:isHosted?[]:[...jobs.values()].slice(-8).reverse()};}
+function startJob(id){const spec=commandMap[id];if(!spec)return null;const job={id:`${Date.now()}-${Math.random().toString(16).slice(2)}`,commandId:id,label:spec.label,status:'running',startedAt:new Date().toISOString(),finishedAt:null,exitCode:null,output:''};jobs.set(job.id,job);const child=spawn(spec.command,spec.args,{cwd:projectRoot,env:{...process.env,NO_COLOR:'1'}});const append=chunk=>{job.output=(job.output+chunk.toString()).slice(-100000);};child.stdout.on('data',append);child.stderr.on('data',append);child.on('error',error=>{append(error.message);job.status='failed';job.finishedAt=new Date().toISOString();});child.on('close',code=>{job.exitCode=code;job.status=code===0?'completed':'failed';job.finishedAt=new Date().toISOString();});return job;}
+const server=http.createServer(async(req,res)=>{try{const url=new URL(req.url,`http://${req.headers.host}`);if(req.method==='GET'&&url.pathname==='/api/dashboard')return send(res,200,await dashboardData());if(isHosted&&url.pathname.startsWith('/api/commands/'))return send(res,403,{error:'Command execution is local-only. Hosted automation requires an authenticated job queue.'});if(req.method==='GET'&&url.pathname.startsWith('/api/jobs/')){const job=jobs.get(url.pathname.split('/').pop());return job?send(res,200,job):send(res,404,{error:'Job not found'});}if(req.method==='POST'&&url.pathname.startsWith('/api/commands/')){const job=startJob(url.pathname.split('/').pop());return job?send(res,202,job):send(res,404,{error:'Command is not allowlisted'});}if(req.method!=='GET')return send(res,405,{error:'Method not allowed'});const file=url.pathname==='/'?'index.html':url.pathname.slice(1);if(!['index.html','app.js','styles.css'].includes(file))return send(res,404,'Not found','text/plain');const types={html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8'};return send(res,200,await readFile(path.join(publicDir,file),'utf8'),types[file.split('.').pop()]);}catch(error){send(res,500,{error:error.message});}});
+server.listen(port,host,()=>console.log(`Acquisition planner dashboard: http://${host}:${port}`));
