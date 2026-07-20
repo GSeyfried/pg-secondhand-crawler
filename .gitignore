@@ -4,6 +4,8 @@ data/dry-run/
 data/checkpoints/
 data/errors/
 data/cache/
+data/normalized/*.json
+data/planner/
 node_modules/
 .env
 .env.*
