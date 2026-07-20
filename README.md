@@ -28,6 +28,7 @@ npm run evaluate-watchlist
 npm run build-acquisition-plan -- --kit-plan griffin-primary-kit --target-date 2026-09-30 --max-budget 3000
 npm run acquisition-report -- --kit-plan griffin-primary-kit
 npm run dashboard
+npm run dashboard:production
 npm run upload-baseline
 ```
 
@@ -68,6 +69,8 @@ The endpoint requires Vercel's `CRON_SECRET` bearer header. Hosted state require
 ## Pilot profiles
 
 The dashboard's Pilot Profiles page keeps the tracked listings shared while applying independent acquisition settings for each pilot. A profile includes pilot and all-up weight, total budget, target date, wing class, porosity and inspection requirements, component price ranges, and watch rules. Griffin's tracked repository config remains the fallback profile.
+
+After a full local crawl, run `npm run dashboard:production` to browse the normalized production listings immediately. The Listings page defaults to confirmed North American locations, links back to each source listing, and shows profile-specific weight, budget, porosity, and inspection flags. Unknown locations remain opt-in.
 
 Hosted profile edits are saved inside the same private Blob snapshot as crawler history. Writes require the `CRON_SECRET` bearer value; the browser asks for it when saving and retains it only in that tab's session storage. Profile reads and the selected dashboard view do not expose the secret.
 
